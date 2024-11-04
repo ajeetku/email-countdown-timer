@@ -71,7 +71,7 @@ class CountdownTimer
   /**
    * @var string
    */
-  private $fontPath = 'fonts/';
+  private $fontPath = './fonts/';
 
   /**
    * @var int
@@ -155,7 +155,12 @@ class CountdownTimer
     $this->fontSettings['path'] = $this->fontPath . $settings['font'] . '.ttf';
     $this->fontSettings['color'] = imagecolorallocate($this->box, $this->fontColor[0], $this->fontColor[1], $this->fontColor[2]);
     $this->fontSettings['size'] = $settings['fontSize'];
-    $this->fontSettings['characterWidth'] = imagefontwidth($this->fontSettings['path']);
+
+    // Calculate the approximate width of a single character using imagettfbbox
+    $text = 'A'; // Example character to measure
+    $bbox = imagettfbbox($this->fontSettings['size'], 0, $this->fontSettings['path'], $text);
+    $this->fontSettings['characterWidth'] = abs($bbox[4] - $bbox[0]);
+    //$this->fontSettings['characterWidth'] = imagefontwidth($this->fontSettings['path']);
 
     // get the width of each character
     $string = "0:";
@@ -167,7 +172,7 @@ class CountdownTimer
     for ($i = 0; $i < $strlen; $i++) {
       $dimensions = imagettfbbox($size, $angle, $fontfile, $string[$i]);
       $this->fontSettings['characterWidths'][] = array(
-        $string[i] => $dimensions[2]
+        $string[$i] => $dimensions[2]
       );
     }
 
