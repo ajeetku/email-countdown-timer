@@ -239,7 +239,7 @@ class CountdownTimer
     //   $this->loops = 0;
     // }
     if ($date['futureDate'] < $date['now']) {
-      $text = '00:00:00';
+      $text = $interval->format('00:00:00');
       $this->loops = 1;
     } else {
       // Calculate total hours remaining
@@ -253,7 +253,7 @@ class CountdownTimer
 
     // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
     foreach ($labels as $key => $label) {
-      imagettftext($image, 15, 0, $this->xOffset + ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
+      imagettftext($image, 15, 0, $this->xOffset -25+ ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
     }
 
     // apply time to new image
