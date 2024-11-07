@@ -231,15 +231,25 @@ class CountdownTimer
       $date['now']
     );
 
+    // if ($date['futureDate'] < $date['now']) {
+    //   $text = $interval->format('00:00:00:00');
+    //   $this->loops = 1;
+    // } else {
+    //   $text = $interval->format('0%a:%H:%I:%S');
+    //   $this->loops = 0;
+    // }
     if ($date['futureDate'] < $date['now']) {
-      $text = $interval->format('00:00:00:00');
+      $text = '00:00:00';
       $this->loops = 1;
     } else {
-      $text = $interval->format('0%a:%H:%I:%S');
+      // Calculate total hours remaining
+      $hours = $interval->days * 24 + $interval->h;
+      $text = sprintf('%02d:%02d:%02d', $hours, $interval->i, $interval->s);
       $this->loops = 0;
     }
 
-    $labels = array('Days', 'Hrs', 'Mins', 'Secs');
+    // $labels = array('Days', 'Hrs', 'Mins', 'Secs');
+    $labels = array('Hrs', 'Mins', 'Secs');
 
     // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
     foreach ($labels as $key => $label) {
