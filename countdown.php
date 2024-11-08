@@ -231,56 +231,67 @@ class CountdownTimer
       $date['now']
     );
 
-    // if ($date['futureDate'] < $date['now']) {
-    //   $text = $interval->format('00:00:00:00');
-    //   $this->loops = 1;
-    // } else {
-    //   $text = $interval->format('0%a:%H:%I:%S');
-    //   $this->loops = 0;
-    // }
-    $houroffset = 2;
-    if ($date['futureDate'] < $date['now']) {
-      $text = $interval->format('00:00:00');
-      $this->loops = 1;
-    } else {
-      // Calculate total hours remaining
-      $hours = $interval->days * 24 + $interval->h;
-      $houroffset = strlen($hours);
-      $text = sprintf('%02d:%02d:%02d', $hours, $interval->i, $interval->s);
-      $this->loops = 0;
+    if(isset($_GET['type']) && $_GET['type']=='with-days'){
+      if ($date['futureDate'] < $date['now']) {
+        $text = $interval->format('00:00:00:00');
+        $this->loops = 1;
+      } else {
+        $text = $interval->format('0%a:%H:%I:%S');
+        $this->loops = 0;
+      }
+
+      $labels = array('Days', 'Hrs', 'Mins', 'Secs');
+      // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
+      foreach ($labels as $key => $label) {
+        imagettftext($image, 15, 0, $this->xOffset -25+ ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
+      }
+
+    }else{
+      // Show only in Hrs min secs
+      $houroffset = 2;
+      if ($date['futureDate'] < $date['now']) {
+        $text = $interval->format('00:00:00');
+        $this->loops = 1;
+      } else {
+        // Calculate total hours remaining
+        $hours = $interval->days * 24 + $interval->h;
+        $houroffset = strlen($hours);
+        $text = sprintf('%02d:%02d:%02d', $hours, $interval->i, $interval->s);
+        $this->loops = 0;
+      }
+
+      
+      $labels = array('Hrs', 'Mins', 'Secs');
+
+      // Adjust label positions to center-align them under the countdown numbers
+      $labelXPositions = [
+        $this->xOffset + $this->characterWidth * 1.4, // Adjust for "Hrs"
+        $this->xOffset + $this->characterWidth * (2+$houroffset),   // Adjust for "Mins"
+        $this->xOffset + $this->characterWidth * (4.9+$houroffset)    // Adjust for "Secs"
+      ];
+      // apply the labels to the image at calculated positions
+      foreach ($labels as $key => $label) {
+        $labelBox = imagettfbbox(15, 0, $font['path'], $label);
+        $labelWidth = abs($labelBox[4] - $labelBox[0]);
+        $labelX = $labelXPositions[$key] - ($labelWidth / 2); // Center the label text
+
+        imagettftext(
+            $image,
+            15,          // Font size
+            0,           // Angle
+            $labelX,     // X position
+            98,          // Y position
+            $font['color'], // Font color
+            $font['path'],  // Font path
+            $label       // Text to print
+        );
+      }
     }
 
-    // $labels = array('Days', 'Hrs', 'Mins', 'Secs');
-    $labels = array('Hrs', 'Mins', 'Secs');
+    // 
+    
 
-    // Adjust label positions to center-align them under the countdown numbers
-    $labelXPositions = [
-      $this->xOffset + $this->characterWidth * 1.4, // Adjust for "Hrs"
-      $this->xOffset + $this->characterWidth * (2+$houroffset),   // Adjust for "Mins"
-      $this->xOffset + $this->characterWidth * (4.9+$houroffset)    // Adjust for "Secs"
-    ];
-    // apply the labels to the image at calculated positions
-    foreach ($labels as $key => $label) {
-      $labelBox = imagettfbbox(15, 0, $font['path'], $label);
-      $labelWidth = abs($labelBox[4] - $labelBox[0]);
-      $labelX = $labelXPositions[$key] - ($labelWidth / 2); // Center the label text
-
-      imagettftext(
-          $image,
-          15,          // Font size
-          0,           // Angle
-          $labelX,     // X position
-          98,          // Y position
-          $font['color'], // Font color
-          $font['path'],  // Font path
-          $label       // Text to print
-      );
-    }
-
-    // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
-    // foreach ($labels as $key => $label) {
-    //   imagettftext($image, 15, 0, $this->xOffset -25+ ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
-    // }
+    
 
     // apply time to new image
     imagettftext($image, $font['size'], 0, $this->xOffset, $this->yOffset, $font['color'], $font['path'], $text);
@@ -325,3 +336,6 @@ new CountdownTimer(array(
 ));
 
 // http://[server-address]/countdown.php?time=2016-12-25+00:00:01&width=640&height=110&boxColor=8B2860&font=BebasNeue&fontColor=FBB92C&fontSize=60&xOffset=155&yOffset=70&labelOffsets=1.4,5,8,11
+
+
+//http://127.0.0.1/email-countdown-timer/countdown.php?type=with-days&time=2024-11-19+00:00:01&width=640&height=110&boxColor=8B2860&font=BebasNeue&fontColor=FBB92C&fontSize=60&xOffset=155&yOffset=70&labelOffsets=1.4,5,8,11
