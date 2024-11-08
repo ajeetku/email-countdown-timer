@@ -238,12 +238,14 @@ class CountdownTimer
     //   $text = $interval->format('0%a:%H:%I:%S');
     //   $this->loops = 0;
     // }
+    $houroffset = 2;
     if ($date['futureDate'] < $date['now']) {
       $text = $interval->format('00:00:00');
       $this->loops = 1;
     } else {
       // Calculate total hours remaining
       $hours = $interval->days * 24 + $interval->h;
+      $houroffset = strlen($hours);
       $text = sprintf('%02d:%02d:%02d', $hours, $interval->i, $interval->s);
       $this->loops = 0;
     }
@@ -251,10 +253,34 @@ class CountdownTimer
     // $labels = array('Days', 'Hrs', 'Mins', 'Secs');
     $labels = array('Hrs', 'Mins', 'Secs');
 
-    // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
+    // Adjust label positions to center-align them under the countdown numbers
+    $labelXPositions = [
+      $this->xOffset + $this->characterWidth * 1.4, // Adjust for "Hrs"
+      $this->xOffset + $this->characterWidth * (2+$houroffset),   // Adjust for "Mins"
+      $this->xOffset + $this->characterWidth * (4.9+$houroffset)    // Adjust for "Secs"
+    ];
+    // apply the labels to the image at calculated positions
     foreach ($labels as $key => $label) {
-      imagettftext($image, 15, 0, $this->xOffset -25+ ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
+      $labelBox = imagettfbbox(15, 0, $font['path'], $label);
+      $labelWidth = abs($labelBox[4] - $labelBox[0]);
+      $labelX = $labelXPositions[$key] - ($labelWidth / 2); // Center the label text
+
+      imagettftext(
+          $image,
+          15,          // Font size
+          0,           // Angle
+          $labelX,     // X position
+          98,          // Y position
+          $font['color'], // Font color
+          $font['path'],  // Font path
+          $label       // Text to print
+      );
     }
+
+    // apply the labels to the image $this->yOffset + ($this->characterHeight * 0.8)
+    // foreach ($labels as $key => $label) {
+    //   imagettftext($image, 15, 0, $this->xOffset -25+ ($this->characterWidth * $this->labelOffsets[$key]), 98, $font['color'], $font['path'], $label);
+    // }
 
     // apply time to new image
     imagettftext($image, $font['size'], 0, $this->xOffset, $this->yOffset, $font['color'], $font['path'], $text);
